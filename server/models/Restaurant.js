@@ -1,26 +1,5 @@
 const mongoose = require('mongoose');
 
-const menuItemSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  description: String,
-  price: {
-    type: Number,
-    required: true,
-  },
-  category: {
-    type: String,
-    required: true,
-  },
-  image: String,
-  isAvailable: {
-    type: Boolean,
-    default: true,
-  },
-});
-
 const restaurantSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -34,23 +13,9 @@ const restaurantSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  address: {
-    street: {
-      type: String,
-      required: true
-    },
-    city: {
-      type: String,
-      required: true
-    },
-    state: {
-      type: String,
-      required: true
-    },
-    zipCode: {
-      type: String,
-      required: true
-    }
+  area: { // e.g., "Downtown", "Midtown"
+    type: String,
+    required: true
   },
   phone: {
     type: String,
@@ -72,18 +37,24 @@ const restaurantSchema = new mongoose.Schema({
   deliveryTime: String,
   minOrder: Number,
   deliveryFee: Number,
-  menu: [menuItemSchema],
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
   isActive: {
     type: Boolean,
     default: true
+  },
+  isFeatured: {
+    type: Boolean,
+    default: false
+  },
+  isOpen: {
+    type: Boolean,
+    default: true
+  },
+  discount: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Restaurant', restaurantSchema); 
+module.exports = mongoose.model('Restaurant', restaurantSchema);

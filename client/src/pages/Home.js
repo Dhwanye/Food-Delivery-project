@@ -15,6 +15,8 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categories] = useState(['All', 'Veg', 'Non-veg', 'Spicy', 'Healthy']);
+  const [cartItems, setCartItems] = useState([]);
+
 
   // Mock data for restaurants
   const mockRestaurants = [
@@ -167,26 +169,26 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        //setLoading(true);
         // Use mock data directly instead of making API calls
-        setRestaurants(mockRestaurants);
-        setFilteredRestaurants(mockRestaurants);
-        setFeaturedItems(mockFeaturedItems);
-        setError(null);
-        setLoading(false);
+        //setRestaurants(mockRestaurants);
+        //setFilteredRestaurants(mockRestaurants);
+       // setFeaturedItems(mockFeaturedItems);
+        //setError(null);
+        //setLoading(false);
         
         // Uncomment this section when your backend is ready
-        /*
+        
         const [restaurantsRes, featuredItemsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/restaurants'),
-          axios.get('http://localhost:5000/api/menu/featured')
+          axios.get('http://localhost:5001/api/restaurants/featured'),
+          axios.get('http://localhost:5001/api/menu-items/featured')
         ]);
         
         setRestaurants(restaurantsRes.data);
         setFilteredRestaurants(restaurantsRes.data);
         setFeaturedItems(featuredItemsRes.data);
         setError(null);
-        */
+        
       } catch (err) {
         console.error('Error fetching data:', err);
         // Use mock data as fallback
@@ -202,6 +204,12 @@ const Home = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartItems(storedCart);
+  }, []);
+
+
   const handleSearch = (e) => {
     e.preventDefault();
     
@@ -215,7 +223,7 @@ const Home = () => {
     const filtered = restaurants.filter(restaurant =>
       restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       restaurant.cuisine.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      restaurant.location.toLowerCase().includes(searchQuery.toLowerCase())
+      restaurant.area.toLowerCase().includes(searchQuery.toLowerCase())
     );
     
     if (filtered.length === 0) {
@@ -231,9 +239,10 @@ const Home = () => {
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
     if (category) {
-      const filteredItems = mockFeaturedItems.filter(item =>
+      const filteredItems = featuredItems.filter(item =>
         item.tags.includes(category.toLowerCase())
       );
+      
       setFeaturedItems(filteredItems);
     } else {
       setFeaturedItems(mockFeaturedItems);
@@ -241,21 +250,20 @@ const Home = () => {
   };
 
   const handleAddToCart = (item) => {
-    // Save item to local storage cart
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItem = cart.find(cartItem => cartItem.id === item.id);
-    
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existingItem = storedCart.find(cartItem => cartItem._id === item._id); // Use _id instead of id if from MongoDB
+  
     if (existingItem) {
       existingItem.quantity = (existingItem.quantity || 1) + 1;
-      localStorage.setItem('cart', JSON.stringify(cart));
     } else {
-      cart.push({ ...item, quantity: 1 });
-      localStorage.setItem('cart', JSON.stringify(cart));
+      storedCart.push({ ...item, quantity: 1 });
     }
-    
+  
+    localStorage.setItem('cart', JSON.stringify(storedCart));
+    setCartItems(storedCart); // ✅ Update state too
     alert('Item added to cart!');
   };
-
+  
   return (
     <div className="home">
       {/* Hero Section */}
@@ -296,141 +304,147 @@ const Home = () => {
 
       {/* Featured Items Section */}
       <section className="featured-section">
-        <div className="section-header">
-          <h2 className="section-title">Featured Items</h2>
-          <Link to="/menu" className="view-all">View All</Link>
-        </div>
-        
-        {loading ? (
-          <div className="loading-spinner">
-            <div className="spinner"></div>
-          </div>
-        ) : error && !searchQuery ? (
-          <div className="error-message">
-            <p>{error}</p>
-            <button onClick={() => window.location.reload()}>Try Again</button>
-          </div>
-        ) : (
-          <div className="food-items-grid">
-            {featuredItems.map((item) => (
-              <div key={item.id} className="food-item-card">
-                <div className="food-image-container">
-                  <img src={item.image} alt={item.name} className="food-item-image" />
+       <div className="section-header">
+       <h2 className="section-title">Featured Items</h2>
+       <Link to="/menu" className="view-all">View All</Link>
+    </div>
+  
+  {loading ? (
+    <div className="loading-spinner">
+      <div className="spinner"></div>
+    </div>
+  ) : error && !searchQuery ? (
+    <div className="error-message">
+      <p>{error}</p>
+      <button onClick={() => window.location.reload()}>Try Again</button>
+    </div>
+  ) : (
+    <>
+      {featuredItems.length === 0 && !loading && !error && (
+        <p className="no-items-message">No items found for this category.</p>
+      )}
+
+      <div className="food-items-grid">
+        {featuredItems.map((item) => (
+          <div key={item.id} className="food-item-card">
+            <div className="food-image-container">
+              <img src={item.image} alt={`Dish: ${item.name}`} className="food-item-image" />
+            </div>
+            <div className="food-item-info">
+              <div className="food-header">
+                <div className="food-title">
+                  <h3>{item.name}</h3>
+                  <div className={`veg-badge ${item.isVeg ? 'veg' : 'non-veg'}`}>
+                    <div className="veg-icon"></div>
+                  </div>
                 </div>
-                <div className="food-item-info">
-                  <div className="food-header">
-                    <div className="food-title">
-                      <h3>{item.name}</h3>
-                      <div className={`veg-badge ${item.isVeg ? 'veg' : 'non-veg'}`}>
-                        <div className="veg-icon"></div>
-                      </div>
-                    </div>
-                    <div className="rating">
-                      <span><FiStar /> {item.rating}</span>
-                    </div>
-                  </div>
-                  <div className="food-tags">
-                    {item.tags.map((tag, index) => (
-                      <span key={index} className={`tag ${tag}`}>{tag}</span>
-                    ))}
-                  </div>
-                  <p className="food-description">{item.description}</p>
-                  <div className="food-item-meta">
-                    <div className="restaurant-info">
-                      <span className="restaurant-link">
-                        <Link to={`/restaurant/${item.restaurantId}`}>
-                          {item.restaurant}
-                        </Link>
-                      </span>
-                    </div>
-                    <span className="food-price">₹{item.price}</span>
-                  </div>
-                  <button
-                    className="add-to-cart-btn"
-                    onClick={() => handleAddToCart(item)}
-                  >
-                    <FiShoppingCart /> Add to Cart
-                  </button>
+                <div className="rating">
+                  <span><FiStar /> {item.rating}</span>
                 </div>
               </div>
-            ))}
+              <div className="food-tags">
+                {item.tags.map((tag, index) => (
+                  <span key={index} className={`tag ${tag}`}>{tag}</span>
+                ))}
+              </div>
+              <p className="food-description">{item.description}</p>
+              <div className="food-item-meta">
+                <div className="restaurant-info">
+                  <span className="restaurant-link">
+                    <Link to={`/restaurant/${item.restaurantId}`}>
+                      {item.restaurant}
+                    </Link>
+                  </span>
+                </div>
+                <span className="food-price">₹{item.price}</span>
+              </div>
+              <button
+                className="add-to-cart-btn"
+                onClick={() => handleAddToCart(item)}
+                aria-label={`Add ${item.name} to cart`}
+              >
+                <FiShoppingCart /> Add to Cart
+              </button>
+            </div>
           </div>
-        )}
-      </section>
+        ))}
+      </div>
+    </>
+  )}
+</section>
+
 
       {/* Restaurants Section */}
       <section className="restaurants-section">
-        <div className="section-header">
-          <h2 className="section-title">Popular Restaurants</h2>
-          <Link to="/restaurants" className="view-all">View All</Link>
+  <div className="section-header">
+    <h2 className="section-title">Popular Restaurants</h2>
+    <Link to="/restaurants" className="view-all">View All</Link>
+  </div>
+
+  {loading ? (
+    <div className="loading-spinner">
+      <div className="spinner"></div>
+    </div>
+  ) : error && searchQuery ? (
+    <div className="error-message">
+      <p>{error}</p>
+      <button onClick={() => {
+        setSearchQuery('');
+        setFilteredRestaurants(restaurants);
+        setError(null);
+      }}>Clear Search</button>
+    </div>
+  ) : (
+    <div className="restaurants-grid">
+      {filteredRestaurants.length === 0 ? (
+        <div className="no-results">
+          <h3>No restaurants found</h3>
+          <p>Try changing your search query</p>
+          <button className="reset-search" onClick={() => setSearchQuery('')}>
+            Show All Restaurants
+          </button>
         </div>
-        
-        {loading ? (
-          <div className="loading-spinner">
-            <div className="spinner"></div>
-          </div>
-        ) : error && searchQuery ? (
-          <div className="error-message">
-            <p>{error}</p>
-            <button onClick={() => {
-              setSearchQuery('');
-              setFilteredRestaurants(restaurants);
-              setError(null);
-            }}>Clear Search</button>
-          </div>
-        ) : (
-          <div className="restaurants-grid">
-            {filteredRestaurants.length > 0 ? (
-              filteredRestaurants.map((restaurant) => (
-                <Link
-                  key={restaurant.id}
-                  to={`/restaurant/${restaurant.id}`}
-                  className="restaurant-card"
-                >
-                  <div className="restaurant-image-container">
-                    <img
-                      src={restaurant.image}
-                      alt={restaurant.name}
-                      className="restaurant-image"
-                    />
-                    {restaurant.discount && (
-                      <div className="discount-badge">{restaurant.discount}</div>
-                    )}
-                  </div>
-                  <div className="restaurant-info">
-                    <h3>{restaurant.name}</h3>
-                    <p className="cuisine">{restaurant.cuisine}</p>
-                    <div className="restaurant-meta">
-                      <span className="rating"><FiStar /> {restaurant.rating}</span>
-                      <span className="delivery-info">
-                        <FiClock /> {restaurant.deliveryTime}
-                      </span>
-                      <span className="location">
-                        <FiMapPin /> {restaurant.location}
-                      </span>
-                    </div>
-                    <div className="restaurant-status">
-                      <span className={`status ${restaurant.isOpen ? 'open' : 'closed'}`}>
-                        {restaurant.isOpen ? 'Open Now' : 'Closed'}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))
-            ) : (
-              <div className="no-results">
-                <h3>No restaurants found</h3>
-                <p>Try changing your search query</p>
-                <button className="reset-search" onClick=
-                {() => {
-                  setSearchQuery('');
-                  setFilteredRestaurants(restaurants);
-                }}>Show All Restaurants</button>
+      ) : (
+        filteredRestaurants.map((restaurant) => (
+          <Link
+            key={restaurant.id}
+            to={`/restaurant/${restaurant.id}`}
+            className="restaurant-card"
+          >
+            <div className="restaurant-image-container">
+              <img
+                src={restaurant.imageUrl}
+                alt={restaurant.name}
+                className="restaurant-image"
+              />
+              {restaurant.discount && (
+                <div className="discount-badge">{restaurant.discount}%</div>
+              )}
+            </div>
+            <div className="restaurant-info">
+              <h3>{restaurant.name}</h3>
+              <p className="cuisine">{restaurant.cuisine}</p>
+              <div className="restaurant-meta">
+                <span className="rating"><FiStar /> {restaurant.rating}</span>
+                <span className="delivery-info">
+                  <FiClock /> {restaurant.deliveryTime}
+                </span>
+                <span className="location">
+                  <FiMapPin /> {restaurant.area}
+                </span>
               </div>
-            )}
-          </div>
-        )}
-      </section>
+              <div className="restaurant-status">
+                <span className={`status ${restaurant.isOpen ? 'open' : 'closed'}`}>
+                  {restaurant.isOpen ? 'Open Now' : 'Closed'}
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))
+      )}
+    </div>
+  )}
+</section>
 
       <Footer />
     </div>

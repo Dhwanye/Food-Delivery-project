@@ -8,14 +8,15 @@ const fs = require('fs');
 const auth = require('./middleware/auth'); 
 const authRoutes = require('./routes/auth');
 const restaurantRoutes = require('./routes/restaurants');
-const menuRoutes = require('./routes/menu');
+//const menuRoutes = require('./routes/menu');
 const menuItemRoutes = require('./routes/menuItems');
-const orderRoutes = require('./routes/orders');
-const paymentRoutes = require('./routes/payments');
-const homeRoutes = require('./routes/home');
-const tableBookingRoutes = require('./routes/tableBooking');
-const databaseRoutes = require('./routes/database');
+//const orderRoutes = require('./routes/orders');
+//const paymentRoutes = require('./routes/payments');
+//const homeRoutes = require('./routes/home');
+//const tableBookingRoutes = require('./routes/tableBooking');
+//const databaseRoutes = require('./routes/database');
 const Restaurant = require('./models/Restaurant');
+
 
 
 const mongoose = require('mongoose');
@@ -125,9 +126,11 @@ app.get('/api/test', (req, res) => {
 //   }
 // });
 app.use('/api/auth', authRoutes);
+app.use('/api/restaurants', restaurantRoutes);
+app.use('/api/menu-items', menuItemRoutes);
 
-app.use('/api/table-bookings', tableBookingRoutes);
-app.use('/api/database', databaseRoutes);
+// app.use('/api/table-bookings', tableBookingRoutes);
+// app.use('/api/database', databaseRoutes);
 // Create database info route (for /api/db-Food_Delivery)
 // app.get('/api/db-Food_Delivery', async (req, res) => {
 //   try {

@@ -27,9 +27,27 @@ const menuItemSchema = new mongoose.Schema({
     ref: 'Restaurant',
     required: true
   },
+  restaurant: { // ✅ For frontend display
+    type: String,
+    required: true
+  },
+  rating: { // ✅ Optional, for display
+    type: Number,
+    default: 0
+  },
+  tags: [String], // ✅ Like ['non-veg', 'spicy']
+  discount: String, // ✅ Example: "₹125 OFF ABOVE ₹349"
+  isVeg: {
+    type: Boolean,
+    default: true
+  },
   isAvailable: {
     type: Boolean,
     default: true
+  },
+  isFeatured: { // ✅ For Featured section
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
@@ -37,4 +55,4 @@ const menuItemSchema = new mongoose.Schema({
 
 const MenuItem = mongoose.model('MenuItem', menuItemSchema);
 
-module.exports = MenuItem; 
+module.exports = MenuItem;
