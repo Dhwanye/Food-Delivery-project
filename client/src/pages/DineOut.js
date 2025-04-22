@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useContext } from 'react';
+import { useAuth } from '../context/AuthContext.js';
 import { Link } from 'react-router-dom';
 import { FiMapPin, FiStar, FiFilter, FiClock, FiChevronDown } from 'react-icons/fi';
 import './DineOut.css';
+import axios from 'axios';
 
 const DineOut = () => {
   const [restaurants, setRestaurants] = useState([]);
+  const { user } = useAuth();
+ // Assuming AuthContext holds user data
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
@@ -26,133 +30,133 @@ const DineOut = () => {
   });
 
   // Mock data for dine-out restaurants
-  const mockRestaurants = [
-    {
-      id: 1,
-      name: 'Saladish',
-      image: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-      cuisine: 'Healthy Food • Fast Food',
-      location: 'Begampura, Surat',
-      distance: 0.2,
-      rating: 4.6,
-      priceForTwo: '₹500 for two',
-      discount: '15% off on walk-in',
-      hasTableBooking: true,
-      offerText: 'Up to 10% off with bank offers',
-      isVeg: true
-    },
-    {
-      id: 2,
-      name: 'Classic Chicken Mamma',
-      image: 'https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-      cuisine: 'North Indian • Mughlai',
-      location: 'Zampa Bazar, Surat',
-      distance: 0.4,
-      rating: 3.4,
-      priceForTwo: '₹500 for two',
-      discount: '15% off on walk-in',
-      hasTableBooking: true,
-      offerText: 'Up to 10% off with bank offers',
-      isVeg: false
-    },
-    {
-      id: 3,
-      name: 'Broast N Rolls',
-      image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-      cuisine: 'Fast Food',
-      location: 'Begampura, Surat',
-      distance: 1,
-      rating: 4.5,
-      priceForTwo: '₹500 for two',
-      discount: '30% off on pre-booking',
-      hasTableBooking: true,
-      offerText: 'Up to 10% off with bank offers',
-      isVeg: false
-    },
-    {
-      id: 4,
-      name: 'Spice Garden',
-      image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-      cuisine: 'Indian • Chinese',
-      location: 'City Light, Surat',
-      distance: 2.5,
-      rating: 4.2,
-      priceForTwo: '₹700 for two',
-      discount: '20% off on walk-in',
-      hasTableBooking: true,
-      offerText: 'Up to 15% off with HDFC cards',
-      isVeg: false
-    },
-    {
-      id: 5,
-      name: 'La Pino\'z Pizza',
-      image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-      cuisine: 'Italian • Pizza',
-      location: 'Vesu, Surat',
-      distance: 3.2,
-      rating: 4.0,
-      priceForTwo: '₹600 for two',
-      discount: '10% off on dine-in',
-      hasTableBooking: true,
-      offerText: 'Buy 1 Get 1 on selected pizzas',
-      isVeg: false
-    },
-    {
-      id: 6,
-      name: 'Seafood Paradise',
-      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-      cuisine: 'Seafood • Continental',
-      location: 'Dumas, Surat',
-      distance: 5,
-      rating: 4.7,
-      priceForTwo: '₹1200 for two',
-      discount: '25% off on pre-booking',
-      hasTableBooking: true,
-      offerText: 'Complimentary dessert with dinner',
-      isVeg: false
-    },
-    {
-      id: 7,
-      name: 'Green Valley',
-      image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-      cuisine: 'Pure Vegetarian • North Indian',
-      location: 'Adajan, Surat',
-      distance: 4.8,
-      rating: 4.5,
-      priceForTwo: '₹600 for two',
-      discount: '10% off on weekdays',
-      hasTableBooking: true,
-      offerText: 'Complimentary dessert with dinner',
-      isVeg: true
-    }
-  ];
-
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setRestaurants(mockRestaurants);
-      setFilteredRestaurants(mockRestaurants);
-      setLoading(false);
-    }, 800);
-  }, []);
-  
+  // const mockRestaurants = [
+  //   {
+  //     id: 1,
+  //     name: 'Saladish',
+  //     image: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+  //     cuisine: 'Healthy Food • Fast Food',
+  //     location: 'Begampura, Surat',
+  //     distance: 0.2,
+  //     rating: 4.6,
+  //     priceForTwo: '₹500 for two',
+  //     discount: '15% off on walk-in',
+  //     hasTableBooking: true,
+  //     offerText: 'Up to 10% off with bank offers',
+  //     isVeg: true
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'Classic Chicken Mamma',
+  //     image: 'https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+  //     cuisine: 'North Indian • Mughlai',
+  //     location: 'Zampa Bazar, Surat',
+  //     distance: 0.4,
+  //     rating: 3.4,
+  //     priceForTwo: '₹500 for two',
+  //     discount: '15% off on walk-in',
+  //     hasTableBooking: true,
+  //     offerText: 'Up to 10% off with bank offers',
+  //     isVeg: false
+  //   },
+  //   {
+  //     id: 3,
+  //     name: 'Broast N Rolls',
+  //     image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+  //     cuisine: 'Fast Food',
+  //     location: 'Begampura, Surat',
+  //     distance: 1,
+  //     rating: 4.5,
+  //     priceForTwo: '₹500 for two',
+  //     discount: '30% off on pre-booking',
+  //     hasTableBooking: true,
+  //     offerText: 'Up to 10% off with bank offers',
+  //     isVeg: false
+  //   },
+  //   {
+  //     id: 4,
+  //     name: 'Spice Garden',
+  //     image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+  //     cuisine: 'Indian • Chinese',
+  //     location: 'City Light, Surat',
+  //     distance: 2.5,
+  //     rating: 4.2,
+  //     priceForTwo: '₹700 for two',
+  //     discount: '20% off on walk-in',
+  //     hasTableBooking: true,
+  //     offerText: 'Up to 15% off with HDFC cards',
+  //     isVeg: false
+  //   },
+  //   {
+  //     id: 5,
+  //     name: 'La Pino\'z Pizza',
+  //     image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+  //     cuisine: 'Italian • Pizza',
+  //     location: 'Vesu, Surat',
+  //     distance: 3.2,
+  //     rating: 4.0,
+  //     priceForTwo: '₹600 for two',
+  //     discount: '10% off on dine-in',
+  //     hasTableBooking: true,
+  //     offerText: 'Buy 1 Get 1 on selected pizzas',
+  //     isVeg: false
+  //   },
+  //   {
+  //     id: 6,
+  //     name: 'Seafood Paradise',
+  //     image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+  //     cuisine: 'Seafood • Continental',
+  //     location: 'Dumas, Surat',
+  //     distance: 5,
+  //     rating: 4.7,
+  //     priceForTwo: '₹1200 for two',
+  //     discount: '25% off on pre-booking',
+  //     hasTableBooking: true,
+  //     offerText: 'Complimentary dessert with dinner',
+  //     isVeg: false
+  //   },
+  //   {
+  //     id: 7,
+  //     name: 'Green Valley',
+  //     image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+  //     cuisine: 'Pure Vegetarian • North Indian',
+  //     location: 'Adajan, Surat',
+  //     distance: 4.8,
+  //     rating: 4.5,
+  //     priceForTwo: '₹600 for two',
+  //     discount: '10% off on weekdays',
+  //     hasTableBooking: true,
+  //     offerText: 'Complimentary dessert with dinner',
+  //     isVeg: true
+  //   }
+  // ];
 
   // useEffect(() => {
-  //   const fetchRestaurants = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost:5001/api/table-bookings'); // update this URL as per your backend
-  //       const data = await response.json();
-  //       setRestaurants(data);
-  //       setFilteredRestaurants(data);
-  //     } catch (error) {
-  //       console.error('Error fetching restaurants:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  
-  //   fetchRestaurants();
+  //   // Simulate API call
+  //   setTimeout(() => {
+  //     setRestaurants(mockRestaurants);
+  //     setFilteredRestaurants(mockRestaurants);
+  //     setLoading(false);
+  //   }, 800);
   // }, []);
+  
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const response = await fetch('http://localhost:5001/api/restaurants'); // update this URL as per your backend
+        const data = await response.json();
+        setRestaurants(data);
+        setFilteredRestaurants(data);
+      } catch (error) {
+        console.error('Error fetching restaurants:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchRestaurants();
+  }, []);
   
 
   useEffect(() => {
@@ -183,7 +187,7 @@ const DineOut = () => {
     
     // Apply veg filter
     if (filters.pureVeg) {
-      result = result.filter(restaurant => restaurant.isVeg);
+      result = result.filter(restaurant => restaurant.isPureVeg);
     }
     
     setFilteredRestaurants(result);
@@ -237,50 +241,76 @@ const DineOut = () => {
   };
   
   const handleBookTableClick = (restaurantId) => {
+    if (!user || !user._id) {
+      alert('You must be logged in to book a table.');
+      return;
+    }
+  
+    // Set the booking details, including userId
     setBookingDetails({
       ...bookingDetails,
-      restaurantId
+      restaurantId,
+      userId: user._id,  // Pass the userId here
     });
-    setShowBookingForm(true);
+  
+    setShowBookingForm(true); // Show the booking form
   };
   
-  const handleBookingSubmit = (e) => {
-    e.preventDefault();
-    const restaurant = restaurants.find(r => r.id === bookingDetails.restaurantId);
-    alert(`Table booked at ${restaurant?.name} for ${bookingDetails.guests} guests on ${bookingDetails.date} at ${bookingDetails.time}`);
-    setShowBookingForm(false);
-  };
+  
+  
+  // const handleBookingSubmit = (e) => {
+  //   e.preventDefault();
+  //   const restaurant = restaurants.find(r => r._id === bookingDetails.restaurantId);
+  //   alert(`Table booked at ${restaurant?.name} for ${bookingDetails.guests} guests on ${bookingDetails.date} at ${bookingDetails.time}`);
+  //   setShowBookingForm(false);
+  // };
   
    
 
 
 
 
-  // const handleBookingSubmit = async (e) => {
-  //   e.preventDefault();
+  const handleBookingSubmit = async (e) => {
+    e.preventDefault();
   
-  //   try {
-  //     const response = await fetch('http://localhost:5000/api/table-bookings', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(bookingDetails),
-  //     });
+    if (!user) {
+      alert("You need to be logged in to book a table.");
+      return;
+    }
   
-  //     if (!response.ok) throw new Error('Failed to book table');
+    const bookingData = {
+      userId: bookingDetails.userId,
+      restaurantId: bookingDetails.restaurantId,
+      date: bookingDetails.date,
+      time: bookingDetails.time,
+      guests: bookingDetails.guests,
+    };
   
-  //     const data = await response.json();
-  //     const restaurant = restaurants.find(r => r.id === bookingDetails.restaurantId);
-  //     alert(`Table booked at ${restaurant?.name} for ${bookingDetails.guests} guests on ${bookingDetails.date} at ${bookingDetails.time}`);
-  //     setShowBookingForm(false);
-  //   } catch (error) {
-  //     alert('Booking failed. Please try again.');
-  //     console.error('Booking error:', error);
-  //   }
-  // };
+    const token = localStorage.getItem('token'); // ⬅️ Get the JWT from localStorage
   
-
+    try {
+      const response = await fetch('http://localhost:5001/api/bookings/book-table', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // ⬅️ Attach the token here
+        },
+        body: JSON.stringify(bookingData),
+      });
+  
+      if (!response.ok) throw new Error('Failed to book table');
+  
+      const data = await response.json();
+      const restaurant = restaurants.find(r => r._id === bookingDetails.restaurantId);
+      alert(`Table booked at ${restaurant?.name} for ${bookingDetails.guests} guests on ${bookingDetails.date} at ${bookingDetails.time}`);
+      setShowBookingForm(false);
+    } catch (error) {
+      alert('Booking failed. Please try again.');
+      console.error('Booking error:', error);
+    }
+  };
+  
+  
   return (
     <div className="dine-out-page">
       <div className="hero-banner">
@@ -373,7 +403,7 @@ const DineOut = () => {
                 >
                   <option value="">Select a restaurant</option>
                   {restaurants.map(r => (
-                    <option key={r.id} value={r.id}>{r.name}</option>
+                    <option key={r._id} value={r._id}>{r.name}</option>
                   ))}
                 </select>
               </div>
@@ -436,9 +466,9 @@ const DineOut = () => {
         ) : (
           <div className="restaurants-grid">
             {filteredRestaurants.map(restaurant => (
-              <div key={restaurant.id} className="restaurant-card">
+              <div key={restaurant._id} className="restaurant-card">
                 <div className="restaurant-image-container">
-                  <img src={restaurant.image} alt={restaurant.name} className="restaurant-image" />
+                  <img src={restaurant.imageUrl} alt={restaurant.name} className="restaurant-image" />
                   {restaurant.discount && (
                     <div className="restaurant-badge">{restaurant.discount}</div>
                   )}
@@ -454,24 +484,25 @@ const DineOut = () => {
                   <div className="restaurant-location">
                     <FiMapPin /> {restaurant.location} • {restaurant.distance} km
                   </div>
-                  <div className="restaurant-price">{restaurant.priceForTwo}</div>
+                  <p className="restaurant-price">₹{restaurant.priceForTwo} for two</p>
+
                   
                   <div className="restaurant-features">
-                    {restaurant.isVeg && (
+                    {restaurant.isPureVeg && (
                       <div className="veg-badge">
                         <div className="veg-icon"></div> Pure Vegetarian
                       </div>
                     )}
                     
-                    {restaurant.hasTableBooking && (
+                    {restaurant.bookingAvailable && (
                       <button 
                         className="book-table-btn"
-                        onClick={() => handleBookTableClick(restaurant.id)}
+                        onClick={() => handleBookTableClick(restaurant._id)}
                       >
                         <span className="icon">🍽️</span> Book a table
                       </button>
                     )}
-                    <div className="offer-text">{restaurant.offerText}</div>
+                    <div className="offer-text">{restaurant.offers}</div>
                   </div>
                 </div>
               </div>

@@ -9,20 +9,35 @@ const Profile = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState('personal');
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    mobile: user?.mobile || '',
-    address: {
-      street: user?.address?.street || '',
-      city: user?.address?.city || '',
-      state: user?.address?.state || '',
-      zipcode: user?.address?.zipcode || '',
-      country: user?.address?.country || ''
-    }
+    name: '',
+    email: '',
+    phone: '',
+    street: '',
+    city: '',
+    state: '',
+    zipcode: '',
+    country: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // ✅ Fetch updated user data from /auth/me
+  const fetchUserData = async () => {
+    try {
+      const res = await fetch('http://localhost:5001/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch user data');
+      const data = await res.json();
+      updateUser(data);
+      return data;
+    } catch (err) {
+      console.error('Failed to fetch latest user data:', err);
+    }
+  };
   
   if (!user) {
     return (
@@ -34,56 +49,137 @@ const Profile = () => {
 
   // Format address for display
   const formatAddress = () => {
-    if (!user.address) return 'No address provided';
-    
-    const { street, city, state, zipcode, country } = user.address;
+    if (!user) return 'No address provided';
+  
+    const { street, city, state, zipcode, country } = user;
     const addressParts = [];
-    
+  
     if (street) addressParts.push(street);
     if (city) addressParts.push(city);
     if (state) addressParts.push(state);
     if (zipcode) addressParts.push(zipcode);
     if (country) addressParts.push(country);
-    
+  
     return addressParts.join(', ') || 'No address provided';
   };
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
+  
 
   const handleAddressChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      address: {
-        ...formData.address,
-        [name]: value
-      }
-    });
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
   };
+  
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError('');
+  //   setSuccess('');
+
+  //   try {
+  //     // Use the updateUser function from AuthContext
+  //     const updatedData = {
+  //       name: formData.name,
+  //       phone: formData.phone,
+  //       street: formData.street,
+  //       city:formData.city,
+  //       zipcode: formData.zipcode,
+  //       country: formData.country,
+  //       email: formData.email,
+  //       state:formData.state
+  //     };
+      
+  //     // Update user in AuthContext (which updates localStorage and state)
+  //     const updatedUser = updateUser(updatedData);
+      
+  //     setSuccess('Profile updated successfully!');
+  //     setIsEditMode(false);
+  //   } catch (err) {
+  //     setError('Failed to update profile. Please try again.');
+  //     console.error('Profile update error:', err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSuccess('');
-
+  
     try {
-      // Use the updateUser function from AuthContext
-      const updatedData = {
-        name: formData.name,
-        mobile: formData.mobile,
-        address: formData.address
-      };
-      
-      // Update user in AuthContext (which updates localStorage and state)
-      const updatedUser = updateUser(updatedData);
-      
+      if (activeTab === 'personal') {
+        const profileData = {
+          name: formData.name,
+          phone: formData.phone
+        };
+  
+        const res = await fetch('http://localhost:5001/api/auth/update-profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user.token}`
+          },
+          body: JSON.stringify(profileData)
+        });
+  
+        if (!res.ok) throw new Error('Failed to update profile');
+  
+        const data = await res.json();
+        updateUser(data);
+      }
+  
+      if (activeTab === 'address') {
+        const addressData = {
+          street: formData.street,
+          city: formData.city,
+          state: formData.state,
+          zipcode: formData.zipcode,
+          country: formData.country
+        };
+  
+        const res = await fetch('http://localhost:5001/api/auth/update-address', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user.token}`
+          },
+          body: JSON.stringify(addressData)
+        });
+  
+        if (!res.ok) throw new Error('Failed to update address');
+  
+        const data = await res.json();
+        updateUser(data);
+      }
+  
+      const latestUser = await fetchUserData(); // ✅ get latest user after update
+  
+      if (latestUser) {
+        setFormData({
+          name: latestUser.name || '',
+          email: latestUser.email || '',
+          phone: latestUser.phone || '',
+          street: latestUser.address?.street || '',
+          city: latestUser.address?.city || '',
+          state: latestUser.address?.state || '',
+          zipcode: latestUser.address?.zipcode || '',
+          country: latestUser.address?.country || ''
+        });
+      }
+  
       setSuccess('Profile updated successfully!');
       setIsEditMode(false);
     } catch (err) {
@@ -93,6 +189,8 @@ const Profile = () => {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="profile-container">
@@ -119,7 +217,7 @@ const Profile = () => {
           <div className="profile-name-card">
             <h2>{user.name}</h2>
             <p>{user.email}</p>
-            {user.mobile && <p><FiPhone /> {user.mobile}</p>}
+            {user.phone && <p><FiPhone /> {user.phone}</p>}
           </div>
           
           <div className="profile-tabs">
@@ -188,9 +286,9 @@ const Profile = () => {
                       <label htmlFor="mobile">Mobile Number</label>
                       <input
                         type="tel"
-                        id="mobile"
-                        name="mobile"
-                        value={formData.mobile}
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
                         onChange={handleInputChange}
                         placeholder="Enter your mobile number"
                       />
@@ -206,7 +304,7 @@ const Profile = () => {
                         type="text"
                         id="street"
                         name="street"
-                        value={formData.address.street}
+                        value={formData.street}
                         onChange={handleAddressChange}
                         placeholder="Enter street address"
                       />
@@ -219,7 +317,7 @@ const Profile = () => {
                           type="text"
                           id="city"
                           name="city"
-                          value={formData.address.city}
+                          value={formData.city}
                           onChange={handleAddressChange}
                           placeholder="Enter city"
                         />
@@ -231,7 +329,7 @@ const Profile = () => {
                           type="text"
                           id="state"
                           name="state"
-                          value={formData.address.state}
+                          value={formData.state}
                           onChange={handleAddressChange}
                           placeholder="Enter state"
                         />
@@ -245,7 +343,7 @@ const Profile = () => {
                           type="text"
                           id="zipcode"
                           name="zipcode"
-                          value={formData.address.zipcode}
+                          value={formData.zipcode}
                           onChange={handleAddressChange}
                           placeholder="Enter ZIP code"
                         />
@@ -257,7 +355,7 @@ const Profile = () => {
                           type="text"
                           id="country"
                           name="country"
-                          value={formData.address.country}
+                          value={formData.country}
                           onChange={handleAddressChange}
                           placeholder="Enter country"
                         />
@@ -325,7 +423,7 @@ const Profile = () => {
                           <FiPhone className="info-icon" />
                           <span>Mobile</span>
                         </div>
-                        <div className="info-value">{user.mobile || 'Not provided'}</div>
+                        <div className="info-value">{user.phone || 'Not provided'}</div>
                       </div>
                       
                       <div className="info-group">

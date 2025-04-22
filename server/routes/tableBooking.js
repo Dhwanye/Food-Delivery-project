@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const TableBooking = require('../models/TableBooking');
+const TableBooking = require('../models/Booking');
 const Restaurant = require('../models/Restaurant');
 const auth = require('../middleware/auth');
 const tableBookingController = require('../controllers/tableBookingController');
+const verifyToken = require('../middleware/verifyToken');
 
+router.post('/book-table', auth, tableBookingController.createBooking);
 // Create a new booking
-router.post('/', auth, tableBookingController.createBooking);
+//router.post('/', auth, tableBookingController.createBooking);
 
 // Get all bookings for a user
 router.get('/user', auth, async (req, res) => {

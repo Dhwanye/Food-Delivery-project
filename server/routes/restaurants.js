@@ -4,7 +4,7 @@ const Restaurant = require('../models/Restaurant');
 const auth = require('../middleware/auth');
 const restaurantController = require('../controllers/restaurantController');
 // Get all restaurants
-//router.get('/', restaurantController.getAllRestaurants);
+router.get('/', restaurantController.getAllRestaurants);
 //featured
 router.get('/featured', restaurantController.getFeaturedRestaurants);
 

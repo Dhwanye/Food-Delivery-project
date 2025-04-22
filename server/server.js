@@ -13,7 +13,7 @@ const menuItemRoutes = require('./routes/menuItems');
 //const orderRoutes = require('./routes/orders');
 //const paymentRoutes = require('./routes/payments');
 //const homeRoutes = require('./routes/home');
-//const tableBookingRoutes = require('./routes/tableBooking');
+const tableBookingRoutes = require('./routes/tableBooking');
 //const databaseRoutes = require('./routes/database');
 const Restaurant = require('./models/Restaurant');
 
@@ -128,7 +128,7 @@ app.get('/api/test', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/menu-items', menuItemRoutes);
-
+app.use('/api/bookings', tableBookingRoutes);
 // app.use('/api/table-bookings', tableBookingRoutes);
 // app.use('/api/database', databaseRoutes);
 // Create database info route (for /api/db-Food_Delivery)
@@ -205,24 +205,25 @@ app.use('/api/menu-items', menuItemRoutes);
 // });
 
 // ✅ Get current user
-app.get('/api/auth/me', async (req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ message: 'Authorization token required' });
+// app.get('/api/auth/me', async (req, res) => {
+//   try {
+//     const authHeader = req.headers.authorization;
+//     if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ message: 'Authorization token required' });
 
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('-password');
-    if (!user) return res.status(404).json({ message: 'User not found' });
+//     const token = authHeader.split(' ')[1];
+//     const decoded = jwt.verify(token, JWT_SECRET);
+//     const user = await User.findById(decoded.userId).select('-password');
+//     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    res.status(200).json(user);
-  } catch (error) {
-    console.error('Auth error:', error);
-    if (error.name === 'JsonWebTokenError') return res.status(401).json({ message: 'Invalid token' });
-    if (error.name === 'TokenExpiredError') return res.status(401).json({ message: 'Token expired' });
-    res.status(500).json({ message: 'Server error during auth check' });
-  }
-});
+//     res.status(200).json(user);
+//   } catch (error) {
+//     console.error('Auth error:', error);
+//     if (error.name === 'JsonWebTokenError') return res.status(401).json({ message: 'Invalid token' });
+//     if (error.name === 'TokenExpiredError') return res.status(401).json({ message: 'Token expired' });
+//     res.status(500).json({ message: 'Server error during auth check' });
+//   }
+// });
+app.use('/api/auth', authRoutes);  // Ensure the authRoutes are included
 
 // 404 handler
 app.use((req, res) => {

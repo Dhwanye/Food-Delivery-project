@@ -52,7 +52,13 @@ const restaurantSchema = new mongoose.Schema({
   discount: {
     type: Number,
     default: 0
-  }
+  },
+  location: String,
+  priceForTwo: Number,
+  isPureVeg: { type: Boolean, default: false },
+  bookingAvailable: { type: Boolean, default: true },
+  distance: Number,
+  offers: String
 }, {
   timestamps: true
 });

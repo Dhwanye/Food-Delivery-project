@@ -17,31 +17,12 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   
-   street: {
-      type: String,
-      required: true,
-    },
-    city: {
-      type: String,
-      required: true,
-    },
-    state: {
-      type: String,
-      required: true,
-    },
-    zipcode: {
-      type: String,
-      required: true,
-    },
-    country: {
-      type: String,
-      required: true,
-    },
-  
-  phone: {
-    type: String,
-    required: true,
-  },
+   street: String,
+    city: String,
+    state: String,
+    zipcode: String,
+    country:String,
+    phone: String,
   role: {
     type: String,
     enum: ['user', 'restaurant', 'admin'],
