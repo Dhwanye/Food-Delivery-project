@@ -180,8 +180,8 @@ const Home = () => {
         // Uncomment this section when your backend is ready
         
         const [restaurantsRes, featuredItemsRes] = await Promise.all([
-          axios.get('http://localhost:5001/api/restaurants/featured'),
-          axios.get('http://localhost:5001/api/menu-items/featured')
+          axios.get('https://food-delivery-project-7os6.onrender.com/api/restaurants/featured'),
+          axios.get('https://food-delivery-project-7os6.onrender.com/api/menu-items/featured')
         ]);
         
         setRestaurants(restaurantsRes.data);

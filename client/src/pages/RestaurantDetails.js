@@ -32,8 +32,8 @@ const RestaurantDetails = () => {
     const fetchRestaurantDetails = async () => {
       try {
         const [restaurantRes, menuRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/restaurants/${id}`),
-          axios.get(`http://localhost:5000/api/restaurants/${id}/menu`)
+          axios.get(`https://food-delivery-project-7os6.onrender.com/api/restaurants/${id}`),
+          axios.get(`https://food-delivery-project-7os6.onrender.com/restaurants/${id}/menu`)
         ]);
         setRestaurant(restaurantRes.data);
         setMenuItems(menuRes.data);

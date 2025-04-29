@@ -144,7 +144,7 @@ const DineOut = () => {
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/restaurants'); // update this URL as per your backend
+        const response = await fetch('https://food-delivery-project-7os6.onrender.com/api/restaurants'); // update this URL as per your backend
         const data = await response.json();
         setRestaurants(data);
         setFilteredRestaurants(data);

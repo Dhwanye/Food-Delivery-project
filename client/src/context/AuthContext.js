@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
 // Create a baseURL that can be easily changed for different environments
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://food-delivery-project-7os6.onrender.com/api';
 
 // Google OAuth Configuration - would typically come from environment variables
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '486416947192-v72oq2gu28e25oqfg5rhnfgfnj85nmlg.apps.googleusercontent.com';

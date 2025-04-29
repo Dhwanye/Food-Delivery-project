@@ -25,7 +25,7 @@ const Profile = () => {
   // ✅ Fetch updated user data from /auth/me
   const fetchUserData = async () => {
     try {
-      const res = await fetch('http://localhost:5001/api/auth/me', {
+      const res = await fetch('https://food-delivery-project-7os6.onrender.com/api/auth/me', {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -126,7 +126,7 @@ const Profile = () => {
           phone: formData.phone
         };
   
-        const res = await fetch('http://localhost:5001/api/auth/update-profile', {
+        const res = await fetch('https://food-delivery-project-7os6.onrender.com/api/auth/update-profile', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ const Profile = () => {
           country: formData.country
         };
   
-        const res = await fetch('http://localhost:5001/api/auth/update-address', {
+        const res = await fetch('https://food-delivery-project-7os6.onrender.com/api/auth/update-address', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
