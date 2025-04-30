@@ -47,7 +47,7 @@ const OrderOnline = () => {
   
         // Make API calls to fetch menu items and featured items
         const [menuItemsRes, featuredItemsRes] = await Promise.all([
-          axios.get('https://food-delivery-project-7os6.onrender.com/menu-items'),
+          axios.get('https://food-delivery-project-7os6.onrender.com/api/menu-items'),
           //axios.get('http://localhost:5001/api/menu-items/featured')
         ]);
   

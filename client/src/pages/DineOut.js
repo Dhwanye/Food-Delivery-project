@@ -289,7 +289,7 @@ const DineOut = () => {
     const token = localStorage.getItem('token'); // ⬅️ Get the JWT from localStorage
   
     try {
-      const response = await fetch('http://localhost:5001/api/bookings/book-table', {
+      const response = await fetch('https://food-delivery-project-7os6.onrender.com/api/bookings/book-table', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
